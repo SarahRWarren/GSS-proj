@@ -5,7 +5,10 @@ rm(list=ls())
 
 df <- read_dta("GSS_stata/gss7222_r4.dta")
 
-df$
 df <- df %>%
-  select(natheal, nathealy, health, race, relig, sexnow1, sex, year) %>%
+  select(natheal, nathealy, health, race, relig, sex, income, year, wtssps, wtssall,
+         wtssnr) %>%
   remove_labels()
+
+write_rds(df, "clean-GSS-vars-w-weights.RDS")
+write_csv(df, "clean-GSS-vars-w-weights.csv")

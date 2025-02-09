@@ -3,7 +3,7 @@
     "path": "~/PhD/Coursework/survey methods/GSS-proj/gss-cumulative-clan.R",
     "project_path": "gss-cumulative-clan.R",
     "type": "r_source",
-    "hash": "2262440712",
+    "hash": "3488805030",
     "contents": "",
     "dirty": false,
     "created": 1739050786998.0,
@@ -13,15 +13,15 @@
         "tempName": "Untitled1",
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "37,0",
+        "cursorPosition": "38,37",
         "scrollLine": "18"
     },
     "folds": "",
-    "lastKnownWriteTime": 1739129436,
+    "lastKnownWriteTime": 1739129475,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1739129436233,
+    "last_content_update": 1739129475694,
     "read_only": false,
     "read_only_alternatives": []
 }

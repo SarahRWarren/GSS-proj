@@ -36,6 +36,7 @@ health_df <- health_df %>%
 
 health_df$sex_factor <- ifelse(health_df$sex==1, "Male", "Female")
 
+#forgive my problematic color choices
 ggplot(health_df, aes(x=year, y=mean_health_bysex, color=sex_factor)) + geom_point() +
   theme_bw() +
   scale_color_manual(values = c("#FC0FE9", "cornflowerblue"))+

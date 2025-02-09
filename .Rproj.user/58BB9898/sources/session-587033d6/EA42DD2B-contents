@@ -1,0 +1,11 @@
+library(tidyverse)
+library(haven)
+library(labelled)
+rm(list=ls())
+
+df <- read_dta("GSS_stata/gss7222_r4.dta")
+
+df$
+df <- df %>%
+  select(natheal, nathealy, health, race, relig, sexnow1, sex, year) %>%
+  remove_labels()

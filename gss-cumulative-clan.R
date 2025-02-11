@@ -8,7 +8,8 @@ rm(list=ls())
 df <- read_dta("GSS_stata/gss7222_r4.dta")
 
 df <- df %>%
-  select(natheal, nathealy, health, race, relig, sex, income, year, wtssps, wtssall,
+  select(natheal, nathealy, health, race, relig, sex, income, happy, educ,
+         year, wtssps, wtssall,
          wtssnr) %>%
   remove_labels()
 

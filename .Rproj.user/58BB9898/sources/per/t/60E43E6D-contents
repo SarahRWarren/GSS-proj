@@ -1,0 +1,244 @@
+library(shiny)
+library(shinyjs)
+library(shinyWidgets)
+library(htmlTable)
+#install.packages("remotes")
+library(remotes)
+#remotes::install_github("limnotrack/rdrop2")
+library(rdrop2)
+library(DT)
+library(dplyr)
+library(tidyverse)
+#install.packages("sortable", repos = c('https://rstudio.r-universe.dev', 'https://cloud.r-project.org'))
+library(sortable)
+
+
+###UI
+ui <- fluidPage(
+  tags$head(
+    #tags$script(jscode),
+    tags$style(
+      "p{font-family:Arial;font-size:14px;width:95%;margin:auto;}"),
+    ## Makes text in tables narrow so they fit the page. "Fixed" forces each
+    ## each cell to have constant width so 100% doesn't take up more space.
+    tags$style(HTML(
+      'table {font-family:Arial Narrow;table-layout:fixed;}'
+      # td {width: 2.9em;overflow: hidden;}
+    ))), 
+  br(),
+  uiOutput("MainAction"), 
+  br(),
+  uiOutput("previousbutton", inline = TRUE),
+  uiOutput("nextbutton", inline = TRUE),
+  
+  useShinyjs()
+  
+)
+
+server <- function(input, output, session) {
+  
+  
+  #what we need
+  #1. page explaining utility function and ideal point
+  #2. voting pages against alternatives
+  #3. likerts
+  #4. Ranked choice
+  
+  #### assigning likert 3,5,7
+  
+  likert3 <- c("Support", "Neither Support nor Oppose", "Oppose")
+  likert5 <- c("Strongly Support", "Support", "Neither Support nor Oppose", "Oppose", "Strongly Oppose")
+  likert7 <- c("Strongly Support", "Support", "Somewhat Support", "Neither Support nor Oppose", "Somewhat Oppose", "Oppose", "Strongly Oppose")
+  
+  likerts <- c(3,5,7)
+  likert_cond <- sample(likerts,1)
+  
+  choices <- case_when(likert_cond =="3" ~ list(likert3),
+                       likert_cond=="5" ~ list(likert5),
+                       likert_cond=="7" ~ list(likert7))
+  
+  choices <- unlist(choices)
+  
+  
+  ### assigning ideal points: on diag, off-up, off-down
+  on <- c(5,5)
+  off_up <- c(2,7)
+  off_down <- c(7,2)
+  
+  draw_ideal_cond <- c(1,2,3)
+  
+  ideal_cond <- sample(draw_ideal_cond,1)
+  
+  ideal_point <- case_when(ideal_cond==1 ~ on,
+                           ideal_cond==2 ~ off_up,
+                           ideal_cond==3 ~ off_down)
+  
+  ### weights <- high or low
+  
+  weights <- c(0.3,0.7)
+  
+  weights_cond <- sample(weights,1)
+  
+  
+  utility <- weights_cond*(ideal_point[1] + ideal_point[2])
+  
+  ## define policy alternatives
+  alt1 <- c(2,2)
+  alt2 <- c(7,7)
+  alt3 <- c(9,1)
+  alt4 <- c(1,9)
+  alt5 <- c(4,4)
+  alt6 <- c(1,1)
+  alt7 <- c(1,10)
+  
+  labels <- list(
+    "(2,2)",
+    "(7,7)",
+    "(9,1)")
+  
+  rank_list_basic <- rank_list(
+    text = "We will randomly select two of the policies. Whichever of the two randomly
+    drawn policies is most favored by the majority of participants will be the new
+    policy and will determine your bonus.",
+    labels = labels,
+    input_id = "rank_list_basic"
+  )
+  
+  
+points1 <- as.data.frame(rbind(ideal_point,alt1))
+
+  output$plot1 <- renderPlot({
+    plot(points1$V1, points1$V2)
+  }, res = 100)
+  
+  output$info <- renderPrint({
+    req(input$plot_click)
+    x <- round(input$plot_click$x, 0)
+    y <- round(input$plot_click$y, 0)
+    cat("[", x, ", ", y, "]", " Your payoff from this policy is:", weights_cond*x+weights_cond*y, sep = "")
+  })
+  
+  
+  points2 <- as.data.frame(rbind(ideal_point,alt2))
+  
+  output$plot2 <- renderPlot({
+    plot(points2$V1, points2$V2)
+  }, res = 100)
+  
+  output$info <- renderPrint({
+    req(input$plot_click)
+    x <- round(input$plot_click$x, 0)
+    y <- round(input$plot_click$y, 0)
+    cat("[", x, ", ", y, "]", " Your payoff from this policy is:", 
+        weights_cond*(x - ideal_point[1])+weights_cond*(y- ideal_point[2]), sep = "")
+  })
+  
+  
+  ###drag and drop
+  
+  output$results_basic <- renderPrint({
+    input$rank_list_basic # This matches the input_id of the rank list
+  })
+ 
+   
+  b=2
+  question <- reactiveValues(i = -b) 
+  
+  
+  ## Next and previous buttons ####
+  observeEvent(input$previousquestion, {question$i <- ifelse(
+    question$i < b & question$i != 1,max(question$i - 1, -b), question$i)})
+  
+  ##now: conditions for when people can hit "next"
+  observeEvent(input$nextquestion, {if(
+    (question$i == -b & length(input$first_page) > 0) |
+    (question$i == (-b + 1) & length(input$second_page) > 0))
+    question$i <- min(question$i+1, b)
+  })
+  
+  ## Previous button: Grayed out on first page, first q, and after submission
+  output$previousbutton <- renderUI({
+    actionButton(
+      "previousquestion", icon=icon("angle-left"), label="Previous",
+      style = if (question$i > -b & question$i <= b & question$i != 1)
+        "color: #000" else "color: #aaa")
+  })
+  
+  output$nextbutton <- renderUI({
+    actionButton(
+      "nextquestion", icon=icon("angle-right"), label="Next",
+      style=if (
+        (question$i == -b & length(input$first_page) > 0) |
+        (question$i == (-b + 1) & length(input$second_page) > 0))
+        "color: #000" else "color: #aaa")
+  }) 
+  
+  
+  
+  
+  ##APP    2
+  output$MainAction <- renderUI({ dynamicUi() })
+  
+  
+  dynamicUi <- reactive({
+    if (question$i==-b) {
+      return(list(
+        
+        p("The proposed point in this round is:", alt1[1],",", alt1[2]),
+        p("Remember, your ideal point is:", ideal_point[1],",", ideal_point[2]),
+        
+        
+        plotOutput("plot1", click = "plot_click"),
+        verbatimTextOutput("info"),
+        
+        radioButtons("first_page", 
+                     "Do you support the proposed policy or oppose it?",
+                     choices = c(choices),  
+                     selected = character(0))
+      ))
+    }
+    
+    if (question$i==-b+1){
+      return(list(
+        
+        p("The proposed point in this round is:", alt2[1],",", alt2[2]),
+        p("Remember, your ideal point is:", ideal_point[1],",", ideal_point[2]),
+        
+        
+        plotOutput("plot2", click = "plot_click"),
+        verbatimTextOutput("info"),
+        
+        radioButtons("second_page", 
+                     "Do you support the proposed policy or oppose it?",
+                     choices = c(choices),  
+                     selected = character(0))
+      ))
+      
+    }
+    if (question$i > -b+1){
+      fluidRow(
+        column(
+          width = 12,
+          tags$h2("Please rank the policies below."),
+          
+            tabPanel(
+              "Default",
+              tags$b("Exercise"),
+              rank_list_basic,
+              tags$b("Result"),
+              verbatimTextOutput("results_basic")
+            ),
+          )
+        )
+      
+          }
+    
+  }
+  
+  
+  )
+  
+}
+
+
+shinyApp(ui, server)

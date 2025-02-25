@@ -1,0 +1,26 @@
+{
+    "id": "60E43E6D",
+    "path": "~/draft-voting/app.R",
+    "project_path": null,
+    "type": "r_source",
+    "hash": "104078199",
+    "contents": "",
+    "dirty": false,
+    "created": 1739318934318.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "132,55",
+        "scrollLine": "115"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1739732651,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1739732651611,
+    "read_only": false,
+    "read_only_alternatives": []
+}

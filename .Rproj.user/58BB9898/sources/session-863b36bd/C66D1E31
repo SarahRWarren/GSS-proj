@@ -1,0 +1,26 @@
+{
+    "id": "C66D1E31",
+    "path": "~/Projects/intra-party affect/intra-party ft/R/wrangle-cumulative.R",
+    "project_path": null,
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1740574813868.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "294,53",
+        "scrollLine": "282"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1717676044,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1717676044,
+    "read_only": false,
+    "read_only_alternatives": []
+}
